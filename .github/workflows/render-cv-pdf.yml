@@ -46,7 +46,8 @@ jobs:
           for-joshi-lab/index.html|for-joshi-lab/Seong-Jun-Kang-CV-Joshi.pdf
           for-hyman-lab/index.html|for-hyman-lab/Seong-Jun-Kang-CV-Hyman.pdf'
 
-          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          # The book bibliography includes its original title and author names.
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils fonts-noto-cjk
 
           echo "$PAGES" | while IFS='|' read -r SRC OUT; do
             SRC=$(echo "$SRC" | xargs); OUT=$(echo "$OUT" | xargs)
