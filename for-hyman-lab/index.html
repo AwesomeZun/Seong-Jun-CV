@@ -23,7 +23,7 @@
 <meta name="twitter:description" content="Computational immunologist working in single-cell and spatial multi-omics of the immune system. Research Scientist applicant, Hyman Lab, MassGeneral Institute for Neurodegenerative Disease.">
 <meta name="twitter:image" content="https://kangseongjun.com/for-hyman-lab/og-image.png">
 <!-- Which source file this deployed copy was cut from. Bump it with every copy. -->
-<meta name="generator" content="Seong-Jun-CV-for-labs/build.py v2.1.3 · blocks/hyman.json">
+<meta name="generator" content="Seong-Jun-CV-for-labs/build.py v2.2.0 · blocks/hyman.json">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -304,18 +304,17 @@ ol.pubs li.pri::after{content:"";position:absolute;left:24px;top:8px;bottom:8px;
         <div class="avail">Available August 2026</div>
       </div>
     </div>
-    <div class="profile"><span class="slab">Research profile</span>I am an immunologist working in computational single-cell analysis. I read immune cell state from large, incomplete single-cell and spatial data, and I check that it holds on held-out donors. The brain work I have done is single-cell immune profiling in an Alzheimer's mouse model, where I built the path from tissue harvest through 10x to the analysis, so what I would carry into human brain transcriptomics is the method rather than the tissue. What I would add is an immune-cell layer, and a way to separate immune programs that drive neurodegeneration from those that only track it. I also write my own funding: lead proposal writer on about $1.3 million of funded industry grants and a more than 30 percent contributor to the roughly $1.6 million SCAID atlas proposal.</div>
+    <div class="profile"><span class="slab">Research profile</span>I am an immunologist specializing in computational single-cell analysis. I built a brain-immune workflow from tissue preparation through 10x sequencing and analysis in a 5xFAD mouse model, and I analyze disease-associated cell states across large human immune atlases. I would contribute an immune-cell perspective and donor-aware evaluation to human brain transcriptomics.</div>
   </header>
 
   <!-- ============ POSITION-RELEVANT EXPERTISE ============ -->
   <section class="sec">
     <div class="sechdr"><h2>Position-Relevant Expertise</h2><div class="rule"></div></div>
     <ul class="interest">
-      <li><b>Brain immune single-cell analysis.</b> In the <b>5xFAD</b> Alzheimer's mouse model I ran the path end to end: whole-brain harvest, enzymatic digestion, Percoll enrichment, CD45⁺ FACS, 10x, then the analysis. Ten immune populations from 11,587 cells, with exhausted CD8⁺ tissue-resident memory T cells engaging choroid-plexus epithelium at the blood–CSF barrier while that epithelium turned on MHC class I, interferon-stimulated genes and JAK-STAT signalling.</li>
-      <li><b>Cell-state calling and held-out testing.</b> From 251,055 memory CD4⁺ T cells with paired receptors, <b>consensus NMF</b> gave twelve reproducible gene programs from k = 14. Because 5′ reads cannot separate the short and long PDE4D isoforms, I wrote UMI-aware, BAM-level code that returns to the alignments and assigns the isoform per cell. The short-isoform state recurs across 702 samples and 23 conditions in the SCAID atlas, and a classifier on subset composition reaches a held-out AUC of 0.780.</li>
-      <li><b>Methods that carry over.</b> <b>Olink</b> targeted plasma proteomics, <b>GeoMx DSP</b> region-of-interest microdissection and profiling, high-parameter flow panels, and <b>scVI/scANVI</b> integration with <b>Milo</b> differential abundance are assays and analyses I have run, on immune cells and tumour tissue. I also designed the causal overexpression test in the PDE4D study.</li>
-      <li><b>Atlas-scale quality control across sites.</b> Multi-site sample QC, milestone tracking and multi-PI coordination across the 700-donor, 8-organ SCAID atlas, with reference material in every collection round and batch written into the model as a variable rather than hoped away.</li>
-      <li><b>Grants written.</b> Lead proposal writer on two Korea Drug Development Fund awards for an anti-CD40 antibody (about $571,000 and $321,000), on two Ministry of SMEs and Startups awards, and on the proposal and study design for a NAVER-funded engineered Treg program, about $1.3 million in all. More than 30 percent of the SCAID proposal, funded at about $1.6 million. All were held by the institutional principal investigator, so my role was proposal writing and project execution, not as PI.</li>
+      <li><b>Brain immune profiling.</b> Whole-brain dissociation, Percoll enrichment, CD45-positive sorting, 10x sequencing, and analysis of 11,587 cells from a 5xFAD mouse model.</li>
+      <li><b>Cell-state analysis.</b> Consensus NMF, scVI/scANVI integration, Milo differential abundance, and custom read-level isoform analysis in Python.</li>
+      <li><b>Atlas-scale evaluation.</b> Multi-site QC across more than 700 donors, with batch-aware models and evaluation held out by donor.</li>
+      <li><b>Complementary measurements.</b> <b>Olink</b> targeted proteomics, <b>GeoMx DSP</b>, high-parameter flow cytometry, and paired T-cell receptor analysis.</li>
     </ul>
   </section>
 
