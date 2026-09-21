@@ -23,7 +23,7 @@
 <meta name="twitter:description" content="Immunologist working in multiplexed protein and RNA measurement, in situ and at single-cell scale. Single-cell and spatial multi-omics, binding measurement, and models checked on held-out data.">
 <meta name="twitter:image" content="https://kangseongjun.com/og-image.png">
 <!-- Which source file this deployed copy was cut from. Bump it with every copy. -->
-<meta name="generator" content="Seong-Jun-CV-for-labs/build.py v2.3.2 · blocks/_root.json">
+<meta name="generator" content="Seong-Jun-CV-for-labs/build.py v2.4.0 · blocks/_root.json">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -170,15 +170,21 @@ ol.outputs .contrib b{color:var(--carbon)}
 .row+.row{border-top:1px solid var(--line-soft)}
 
 /* ---------- mentoring ---------- */
-.mentorlist{display:grid;grid-template-columns:1fr 1fr;column-gap:22px}
-.mentoritem{display:grid;grid-template-columns:42px 1fr;gap:9px;padding:6px 0;
-            border-bottom:1px solid var(--line-soft);break-inside:avoid}
-.mentoryear{font-size:10.5px;font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
-.mentorname{font-size:11.7px;font-weight:800;color:var(--carbon);line-height:1.3}
-.mentorrole{font-size:9.5px;font-weight:700;color:var(--slate);text-transform:uppercase;
-            letter-spacing:.25px;margin-top:1px}
-.mentoraff{font-size:10px;color:var(--graphite);line-height:1.35;margin-top:2px}
-.mentortopics{font-size:10px;color:var(--ink);line-height:1.38;margin-top:3px}
+.mentortable{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;
+             border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mentortable col.year{width:7%}.mentortable col.mentee{width:20%}
+.mentortable col.affiliation{width:32%}.mentortable col.training{width:41%}
+.mentortable thead{display:table-header-group}
+.mentortable th{background:var(--carbon);color:#fff;text-align:left;font-size:9.5px;
+                letter-spacing:.35px;text-transform:uppercase;padding:7px 8px}
+.mentortable td{vertical-align:top;padding:7px 8px;border-top:1px solid var(--line-soft);
+                font-size:9.8px;line-height:1.35;color:var(--ink);overflow-wrap:anywhere}
+.mentortable tbody tr:first-child td{border-top:none}
+.mentortable tbody tr:nth-child(even){background:#f7f9fb}
+.mentortable .myear{font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
+.mentortable .mname{font-size:10.5px;font-weight:800;color:var(--carbon);line-height:1.25}
+.mentortable .mrole{font-size:8.9px;font-weight:700;color:var(--slate);line-height:1.3;margin-top:2px}
+.mentortable .maff{color:var(--graphite)}
 
 /* ---------- publications ---------- */
 .pubstats{display:flex;flex-wrap:wrap;gap:0;border:1.5px solid var(--carbon);border-radius:10px;overflow:hidden;margin:2px 0 9px;box-shadow:2px 2px 0 var(--carbon)}
@@ -260,7 +266,14 @@ ol.pubs li.pri::after{content:"";position:absolute;left:24px;top:8px;bottom:8px;
 
 @media (max-width:680px){
   .summary3{grid-template-columns:1fr}.hgrid{flex-direction:column}.hright{text-align:left}
-  .row,.skillrow{grid-template-columns:1fr;gap:2px}.row .lab,.skillrow .lab{text-align:left}.refgrid,.mentorlist{grid-template-columns:1fr}
+  .row,.skillrow{grid-template-columns:1fr;gap:2px}.row .lab,.skillrow .lab{text-align:left}.refgrid{grid-template-columns:1fr}
+  .mentortable,.mentortable tbody,.mentortable tr,.mentortable td{display:block;width:100%}
+  .mentortable col,.mentortable thead{display:none}
+  .mentortable tr{padding:7px 10px;border-top:1px solid var(--line)}
+  .mentortable tbody tr:first-child{border-top:none}
+  .mentortable td{display:grid;grid-template-columns:92px 1fr;gap:8px;padding:3px 0;border:0;background:transparent}
+  .mentortable td::before{content:attr(data-label);font-size:8.5px;font-weight:800;
+                          letter-spacing:.25px;text-transform:uppercase;color:var(--slate)}
 }
 @media print{
   @page{size:Letter;margin:12mm 13mm}
@@ -270,7 +283,7 @@ ol.pubs li.pri::after{content:"";position:absolute;left:24px;top:8px;bottom:8px;
   .shell{display:block;max-width:none;margin:0;padding:0;gap:0}
   .page{margin:0;max-width:none;padding:0;box-shadow:none}
   .sec{margin-top:13px}
-  .sechdr,.row,.skillrow,ol.pubs li,.refblk{break-inside:avoid}
+  .sechdr,.row,.skillrow,ol.pubs li,.refblk,.mentortable tr{break-inside:avoid}
   /* break-inside alone let a heading sit alone at the foot of a page with its first entry
      on the next one. */
   .sechdr,.sublbl{break-after:avoid;page-break-after:avoid}
@@ -500,76 +513,114 @@ ol.pubs li.pri::after{content:"";position:absolute;left:24px;top:8px;bottom:8px;
   <!-- ============ MENTORING AND RESEARCH TRAINING ============ -->
   <section class="sec">
     <div class="sechdr"><h2>Mentoring and Research Training</h2><div class="rule"></div></div>
-    <div class="mentorlist">
-      <div class="mentoritem">
-        <div class="mentoryear">2013</div>
-        <div class="mentorbody"><div class="mentorname">Sung Ha Lim, M.D., Ph.D.</div><div class="mentorrole">Student intern</div><div class="mentoraff">Postdoctoral Fellow; Laboratory of Shadmehr Demehri, M.D., Ph.D.; Department of Dermatology, Massachusetts General Hospital; Harvard Medical School, Boston, MA, USA</div><div class="mentortopics"><b>Training:</b> Cell culture, Western blotting, flow cytometry, and C57BL/6 mouse breeding.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2015</div>
-        <div class="mentorbody"><div class="mentorname">Soyoung Jeong, Ph.D.</div><div class="mentorrole">Student intern</div><div class="mentoraff">Postdoctoral associate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Cell culture, flow cytometry, and in vivo mouse experiments.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2016</div>
-        <div class="mentorbody"><div class="mentorname">Sowon Choi, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Mouse pancreatic islet isolation, pancreatic islet beta-cell functional assays, and ion channel assays.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2021</div>
-        <div class="mentorbody"><div class="mentorname">Hyo Jeong Nam, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea; Visiting Scholar; Laboratory of Seunghee Kim-Schulze, Ph.D.; Department of Immunology and Immunotherapy; Icahn School of Medicine at Mount Sinai, New York, NY, USA</div><div class="mentortopics"><b>Training:</b> GeoMx DSP, T-cell functional assays, and single-cell RNA sequencing (scRNA-seq) data analysis using R.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2021</div>
-        <div class="mentorbody"><div class="mentorname">Beom Keun Cho, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> GeoMx DSP, mouse breeding, cell culture, T-cell functional assays, and scRNA-seq data analysis using R.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2021</div>
-        <div class="mentorbody"><div class="mentorname">Minji Kang, Ph.D.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Postdoctoral associate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> GeoMx DSP spatial transcriptomics data analysis and T-cell functional assays.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2021</div>
-        <div class="mentorbody"><div class="mentorname">Jung Ho Lee, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate, Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea; Visiting Scholar, Laboratory of Ulrich von Andrian, M.D., Ph.D.; Department of Immunology, Harvard Medical School, Boston, MA, USA</div><div class="mentortopics"><b>Training:</b> Analysis of scRNA-seq data using R.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2021</div>
-        <div class="mentorbody"><div class="mentorname">Hyun Seung Choi, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Analysis of scRNA-seq data using R.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2022</div>
-        <div class="mentorbody"><div class="mentorname">Yuji Lee, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2022</div>
-        <div class="mentorbody"><div class="mentorname">Sanha Hwang, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2022</div>
-        <div class="mentorbody"><div class="mentorname">Dongjun Kim, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2022</div>
-        <div class="mentorbody"><div class="mentorname">Yewon Moon, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2022</div>
-        <div class="mentorbody"><div class="mentorname">Karoliina Eliisa Ruhno, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Senior Researcher; IMBiologics Corp., Suwon, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Regulatory T-cell suppression assays.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2023</div>
-        <div class="mentorbody"><div class="mentorname">Moongi Chae, M.S.</div><div class="mentorrole">Student intern</div><div class="mentoraff">Ph.D. Student; Johns Hopkins University, Baltimore, MD, USA</div><div class="mentortopics"><b>Training:</b> Immune-cell culture, flow cytometry, and scRNA-seq data analysis using machine-learning models and AI tools.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2023</div>
-        <div class="mentorbody"><div class="mentorname">Sung Bin Bae, M.S.</div><div class="mentorrole">Incoming graduate student</div><div class="mentoraff">Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Cell culture, flow cytometry, and GeoMx DSP spatial-transcriptomics data analysis.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2024</div>
-        <div class="mentorbody"><div class="mentorname">Mi Jeong Oh, M.S.</div><div class="mentorrole">Manager, PB Immune Therapeutics</div><div class="mentoraff">Manager; PB Immune Therapeutics, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Experimental design for animal sample collection, ELISA and SPR assay design, and 10x Genomics scRNA-seq.</div></div>
-      </div>
-      <div class="mentoritem">
-        <div class="mentoryear">2024</div>
-        <div class="mentorbody"><div class="mentorname">Eun Sol Jo, B.S.</div><div class="mentorrole">Assistant Manager, PB Immune Therapeutics</div><div class="mentoraff">Assistant Manager; PB Immune Therapeutics, Seoul, Republic of Korea</div><div class="mentortopics"><b>Training:</b> Animal experiment design and evaluation of a mouse model of experimental autoimmune encephalomyelitis (EAE).</div></div>
-      </div>
-    </div>
+    <table class="mentortable">
+      <colgroup><col class="year"><col class="mentee"><col class="affiliation"><col class="training"></colgroup>
+      <thead><tr><th scope="col">Year</th><th scope="col">Mentee / role at time</th><th scope="col">Current affiliation</th><th scope="col">Research training</th></tr></thead>
+      <tbody>
+      <tr>
+        <td class="myear" data-label="Year">2013</td>
+        <td data-label="Mentee"><div class="mname">Sung Ha Lim, M.D., Ph.D.</div><div class="mrole">Student intern</div></td>
+        <td class="maff" data-label="Current affiliation">Postdoctoral Fellow; Laboratory of Shadmehr Demehri, M.D., Ph.D.; Department of Dermatology, Massachusetts General Hospital; Harvard Medical School, Boston, MA, USA</td>
+        <td data-label="Research training">Cell culture, Western blotting, flow cytometry, and C57BL/6 mouse breeding.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2014</td>
+        <td data-label="Mentee"><div class="mname">Soyoung Jeong, Ph.D.</div><div class="mrole">Student intern</div></td>
+        <td class="maff" data-label="Current affiliation">Postdoctoral Associate; Medical Research Center, Seoul National University, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Cell culture, flow cytometry, and in vivo mouse experiments.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2016</td>
+        <td data-label="Mentee"><div class="mname">Sowon Choi, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Mouse pancreatic islet isolation, pancreatic islet beta-cell functional assays, and ion channel assays.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2021</td>
+        <td data-label="Mentee"><div class="mname">Hyo Jeong Nam, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Visiting Scholar; Laboratory of Seunghee Kim-Schulze, Ph.D.; Department of Immunology and Immunotherapy; Icahn School of Medicine at Mount Sinai, New York, NY, USA; Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">GeoMx DSP, T-cell functional assays, and single-cell RNA sequencing (scRNA-seq) data analysis using R.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2021</td>
+        <td data-label="Mentee"><div class="mname">Beom Keun Cho, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">GeoMx DSP, mouse breeding, cell culture, T-cell functional assays, and scRNA-seq data analysis using R.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2021</td>
+        <td data-label="Mentee"><div class="mname">Minji Kang, Ph.D.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Postdoctoral Associate; Transplantation Research Institute; Seoul National University Medical Research Center, Seoul, Republic of Korea</td>
+        <td data-label="Research training">GeoMx DSP spatial transcriptomics data analysis and T-cell functional assays.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2021</td>
+        <td data-label="Mentee"><div class="mname">Jung Ho Lee, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Visiting Scholar; Laboratory of Ulrich von Andrian, M.D., Ph.D.; Department of Immunology, Harvard Medical School, Boston, MA, USA; Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">scRNA-seq data analysis using R.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2021</td>
+        <td data-label="Mentee"><div class="mname">Hyun Seung Choi, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">scRNA-seq data analysis using R.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2022</td>
+        <td data-label="Mentee"><div class="mname">Yuji Lee, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2022</td>
+        <td data-label="Mentee"><div class="mname">Sanha Hwang, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2022</td>
+        <td data-label="Mentee"><div class="mname">Dongjun Kim, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2022</td>
+        <td data-label="Mentee"><div class="mname">Yewon Moon, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Candidate; Department of Biomedical Sciences; Seoul National University Graduate School, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Regulatory T-cell suppression assays and scRNA-seq data analysis using R and machine-learning models.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2022</td>
+        <td data-label="Mentee"><div class="mname">Karoliina Eliisa Ruhno, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Senior Researcher; IMBiologics, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Regulatory T-cell suppression assays.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2023</td>
+        <td data-label="Mentee"><div class="mname">Moonki Chae, M.S.</div><div class="mrole">Student intern</div></td>
+        <td class="maff" data-label="Current affiliation">Ph.D. Student; Department of Pathology; Johns Hopkins University, Baltimore, MD, USA</td>
+        <td data-label="Research training">Immune-cell culture, flow cytometry, and scRNA-seq data analysis using machine-learning models and AI tools.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2023</td>
+        <td data-label="Mentee"><div class="mname">Sung Bin Bae, M.S.</div><div class="mrole">Incoming graduate student</div></td>
+        <td class="maff" data-label="Current affiliation">Researcher; Yuhan Corporation, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Cell culture, flow cytometry, and GeoMx DSP spatial transcriptomics data analysis.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2024</td>
+        <td data-label="Mentee"><div class="mname">Mi Jeong Oh, M.S.</div><div class="mrole">Manager, PB Immune Therapeutics</div></td>
+        <td class="maff" data-label="Current affiliation">Manager; PB Immune Therapeutics, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Experimental design for animal sample collection, ELISA and SPR assay design, and 10x Genomics scRNA-seq.</td>
+      </tr>
+      <tr>
+        <td class="myear" data-label="Year">2024</td>
+        <td data-label="Mentee"><div class="mname">Eun Sol Jo, B.S.</div><div class="mrole">Assistant Manager, PB Immune Therapeutics</div></td>
+        <td class="maff" data-label="Current affiliation">Assistant Manager; PB Immune Therapeutics, Seoul, Republic of Korea</td>
+        <td data-label="Research training">Animal experiment design and evaluation of a mouse model of experimental autoimmune encephalomyelitis (EAE).</td>
+      </tr>
+      </tbody>
+    </table>
   </section>
 
   <!-- ============ REFERENCES ============ -->
