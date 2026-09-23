@@ -144,6 +144,7 @@ const exportName = document.querySelector('.cv-download')?.getAttribute('href')?
           .cv-download-toolbar, .cv-chat-fab, .askpane { display: none !important; }
           .shell { display: block !important; margin: 0 !important; padding: 0 !important; }
           .page { padding: 0 !important; }
+          #books { break-inside: avoid; }
           body { font-size: 11.5pt; line-height: 1.52; }
           .name { font-size: 29pt; }
           .profile, ol.outputs li, .row .main, ol.pubs li, .publist li, .skillrow .items, .interest, .inline, .refblk { font-size: 11.5pt; }
