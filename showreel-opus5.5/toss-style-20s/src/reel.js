@@ -1,0 +1,702 @@
+(() => {
+/* ---------- variant ---------- */
+const CFG = Object.assign({ lang: 'ko', orient: 'landscape' }, window.REEL_CFG || {});
+const Q = new URLSearchParams(location.search);
+if (Q.get('lang')) CFG.lang = Q.get('lang');
+if (Q.get('orient')) CFG.orient = Q.get('orient');
+const EN = CFG.lang === 'en', PORT = CFG.orient === 'portrait';
+const W = PORT ? 1080 : 1920, H = PORT ? 1920 : 1080, DUR = 20, TAU = Math.PI * 2;
+const MX = PORT ? 88 : 140;
+
+const cv = document.getElementById('cv');
+cv.width = W; cv.height = H; cv.style.aspectRatio = `${W} / ${H}`;
+const ctx = cv.getContext('2d');
+const HAS_LS = 'letterSpacing' in ctx;
+
+/* ---------- palette & type ---------- */
+const C = {
+  bg: '#FFFFFF', grey: '#F2F4F6', grey2: '#E5E8EB', ink: '#191F28', sub: '#4E5968', mute: '#8B95A1',
+  blue: '#3182F6', blueL: '#E8F3FF', green: '#15C47E', orange: '#FE9800', purple: '#8B5CF6', red: '#F04452'
+};
+const PF = '"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+
+/* ---------- copy ---------- */
+const T = EN ? {
+  s1a: "Hi, I'm", s1b: [['Seong-Jun Kang', C.blue]], s1c: 'Computational immunologist · Ph.D.',
+  s2: [[['Wet lab and data.', C.ink]], [['I do ', C.ink], ['both.', C.blue]]], s2sub: 'From primary-cell assays to multimodal models',
+  s2rows: [['flask', 'Experimental immunology', 'Flow · Biacore SPR · Olink', C.blue], ['dna', 'Single-cell analysis', 'scRNA · scTCR · snATAC', C.green],
+           ['grid', 'Spatial transcriptomics', 'GeoMx DSP · Visium · MACSima', C.orange], ['net', 'Multimodal deep learning', 'Imaging + transcriptome + clinical', C.purple]],
+  s3lab: 'Papers', s3big: '18', s3suf: '', s3chip: '17 peer-reviewed · 1 in revision',
+  s3rows: [['star', 'First / co-first author', 'incl. Nature Immunology', '6', C.orange], ['people', 'Donor immune atlas', 'SCAID · 8 organs', '700+', C.green],
+           ['coin', 'Industry awards', 'KDDF · MSS · NAVER', '$1.3M', C.blue], ['doc', 'Registered patents', 'Anti-CD40 · JAK inhibitor', '2', C.purple]],
+  s4head: 'Published in', coFirst: 'Co-first author', coAuth: 'Co-author', inRev: 'In revision', s4note: 'PDE4D short-isoform bias · Th1.17',
+  s5: [[['From measurement', C.ink]], [['to ', C.ink], ['model.', C.blue]]], seg: ['Measure', 'Model'],
+  s6head: 'The path so far',
+  tl: [['2008', 'Sungkyunkwan University', 'B.S. Genetic Engineering'], ['2014', 'Seoul National University', 'M.S. Biomedical Sciences'],
+       ['2016', 'SNU Transplantation Institute', 'Research personnel · NHP studies'], ['2021', 'PB Immune Therapeutics', 'Manager · anti-CD40 program'],
+       ['2023', 'Ph.D., Seoul National University', 'Associate Director at PB'], ['2025', 'Yonsei Wonju College of Medicine', 'Postdoc · multimodal deep learning'],
+       ['2026', 'Boston, MA', 'Next chapter']],
+  s7name: 'Seong-Jun Kang', s7sub: 'Ph.D. · Computational immunologist', cta: 'See more at kangseongjun.com', s7foot: 'Boston, MA'
+} : {
+  s1a: '안녕하세요,', s1b: [['강성준', C.blue], ['이에요', C.ink]], s1c: '면역을 데이터로 읽는 계산 면역학자',
+  s2: [[['실험과 데이터,', C.ink]], [['둘 다', C.blue], [' 해요', C.ink]]], s2sub: '일차 세포 실험부터 다중모달 분석까지',
+  s2rows: [['flask', '실험 면역학', 'Flow · Biacore SPR · Olink', C.blue], ['dna', '단일세포 분석', 'scRNA · scTCR · snATAC', C.green],
+           ['grid', '공간 전사체', 'GeoMx DSP · Visium · MACSima', C.orange], ['net', '다중모달 딥러닝', '영상 + 전사체 + 임상 데이터', C.purple]],
+  s3lab: '논문', s3big: '18', s3suf: '편', s3chip: '동료심사 17편 · 수정 중 1편',
+  s3rows: [['star', '제1·공동 제1저자', 'Nature Immunology 포함', '6편', C.orange], ['people', '공여자 아틀라스', 'SCAID · 8개 장기', '700+명', C.green],
+           ['coin', '산업 과제 기획·수행', 'KDDF · 중기부 · NAVER', '$1.3M', C.blue], ['doc', '등록 특허', '항-CD40 · JAK 억제제', '2건', C.purple]],
+  s4head: '이런 저널에 실렸어요', coFirst: '공동 제1저자', coAuth: '공저자', inRev: '수정 중', s4note: 'PDE4D short-isoform bias · Th1.17',
+  s5: [[['측정부터 모델까지', C.ink]], [['직접', C.blue], [' 해요', C.ink]]], seg: ['측정', '모델'],
+  s6head: '지나온 길',
+  tl: [['2008', '성균관대학교', '유전공학 학사'], ['2014', '서울대학교', '의과학 석사'], ['2016', '서울대 이식연구소', '전문연구요원 · 영장류 연구'],
+       ['2021', 'PB Immune Therapeutics', '매니저 · 항-CD40 과제'], ['2023', '서울대학교 의과학 박사', 'PB 부이사 (Associate Director)'],
+       ['2025', '연세대 원주의과대학', '박사후연구원 · 다중모달 딥러닝'], ['2026', 'Boston, MA', '다음 챕터']],
+  s7name: '강성준', s7sub: 'Ph.D. · 계산 면역학자', cta: 'kangseongjun.com에서 더 보기', s7foot: 'Boston, MA'
+};
+const JN = [
+  ['Scientific Reports', '2019', '', T.coAuth, C.green],
+  ['Xenotransplantation', '2024', 'IF 3.9', T.coFirst, C.orange],
+  ['JEADV', '2022', 'IF 9.2', T.coFirst, C.purple],
+  ['eBioMedicine', '2024', 'IF 11.1', T.coAuth, C.red],
+  ['Allergy', '2025', 'IF 12.6', T.coFirst, C.green],
+  ['Nature Immunology', '2026', T.inRev, T.coFirst, C.blue]
+];
+const TOOLS = [['GeoMx DSP', 'grid', 0], ['Visium', 'grid', 0], ['10x Chromium', 'dna', 0], ['MACSima', 'flask', 0], ['Biacore SPR', 'flask', 0],
+               ['Olink', 'doc', 0], ['Seurat · Scanpy', 'net', 1], ['scVI · cNMF', 'net', 1], ['PyTorch', 'net', 1]];
+const TCOL = [C.orange, C.orange, C.green, C.purple, C.blue, C.red, C.blue, C.purple, C.red];
+
+/* ---------- math ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const inv = (a, b, x) => clamp((x - a) / (b - a));
+const eOut3 = t => 1 - Math.pow(1 - t, 3);
+const eOut5 = t => 1 - Math.pow(1 - t, 5);
+const eIn3 = t => t * t * t;
+const eIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const spring = p => p <= 0 ? 0 : p >= 1 ? 1 : 1 - Math.exp(-6.5 * p) * Math.cos(9.5 * p);
+const sp = (t, a, d = .55) => spring(inv(a, a + d, t));
+const fade = (t, a, d = .25) => eOut3(inv(a, a + d, t));
+function hexRgb(h){ const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function mix(a, b, t){ const A = hexRgb(a), B = hexRgb(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], clamp(t)))).join(',')})`; }
+
+/* ---------- drawing helpers ---------- */
+let GA = 1;                               // scene-level alpha; element alphas multiply into it
+const A = a => { ctx.globalAlpha = GA * clamp(a); };
+function font(w, s){
+  ctx.font = `${w} ${s}px ${PF}`;
+  if (HAS_LS) ctx.letterSpacing = s >= 60 ? `${(-s * .03).toFixed(1)}px` : s >= 30 ? `${(-s * .012).toFixed(1)}px` : '0px';
+}
+function fitFont(str, w, s, maxW){ font(w, s); const m = ctx.measureText(str).width; if (m > maxW){ s = Math.floor(s * maxW / m); font(w, s); } return s; }
+function rr(x, y, w, h, r){
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function card(x, y, w, h, r, fill = C.bg, shadow = true){
+  ctx.save();
+  if (shadow){ ctx.shadowColor = 'rgba(2,32,71,.10)'; ctx.shadowBlur = 48; ctx.shadowOffsetY = 16; }
+  ctx.fillStyle = fill; rr(x, y, w, h, r); ctx.fill(); ctx.restore();
+}
+/* a line of coloured segments that rises in on a spring */
+function lineIn(segs, x, y, size, weight, t, t0, align = 'left', maxW = W - 2 * MX){
+  const p = inv(t0, t0 + .6, t); if (p <= 0) return;
+  const str = segs.map(s => s[0]).join('');
+  size = fitFont(str, weight, size, maxW);
+  const ws = segs.map(s => ctx.measureText(s[0]).width), tot = ws.reduce((a, b) => a + b, 0);
+  let cx = align === 'center' ? x - tot / 2 : align === 'right' ? x - tot : x;
+  const yo = (1 - spring(p)) * size * .5;
+  A(fade(t, t0)); ctx.textAlign = 'left';
+  segs.forEach((s, k) => { ctx.fillStyle = s[1]; ctx.fillText(s[0], cx, y + yo); cx += ws[k]; });
+  A(1);
+}
+
+/* glossy round icon with a simple white glyph */
+function icon(kind, cx, cy, r, col){
+  if (r <= 0) return;
+  const g = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  g.addColorStop(0, mix(col, '#ffffff', .38)); g.addColorStop(1, col);
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill();
+  const ga = ctx.globalAlpha; ctx.globalAlpha = ga * .28; ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.ellipse(cx - r * .22, cy - r * .5, r * .5, r * .22, -.3, 0, TAU); ctx.fill(); ctx.globalAlpha = ga;
+  glyph(kind, cx, cy, r * .52, col);
+}
+function glyph(kind, cx, cy, s, col){
+  ctx.save(); ctx.translate(cx, cy);
+  ctx.strokeStyle = '#fff'; ctx.fillStyle = '#fff'; ctx.lineWidth = Math.max(2, s * .17); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const P = (pts, close, fill) => { ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x * s, y * s) : ctx.moveTo(x * s, y * s)); if (close) ctx.closePath(); fill ? ctx.fill() : ctx.stroke(); };
+  const dot = (x, y, r) => { ctx.beginPath(); ctx.arc(x * s, y * s, r * s, 0, TAU); ctx.fill(); };
+  switch (kind){
+    case 'flask':
+      P([[-.34, -.82], [.34, -.82]]); P([[-.2, -.82], [-.2, -.2], [-.72, .72], [.72, .72], [.2, -.2], [.2, -.82]]);
+      P([[-.5, .34], [.5, .34], [.72, .72], [-.72, .72]], true, true); break;
+    case 'dna': {
+      for (const sg of [1, -1]){ ctx.beginPath(); for (let k = 0; k <= 20; k++){ const y = -.85 + k * .085, x = Math.sin(y * 3.4) * .45 * sg; k ? ctx.lineTo(x * s, y * s) : ctx.moveTo(x * s, y * s); } ctx.stroke(); }
+      for (const y of [-.55, -.1, .35]){ const x = Math.sin(y * 3.4) * .45; P([[-x, y], [x, y]]); } break; }
+    case 'grid': for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) dot(i * .52 + (j & 1 ? .26 : 0) - .13 * (j & 1), j * .48, .17); break;
+    case 'net': {
+      const L = [[-.7, -.45], [-.7, .45]], M = [[0, -.7], [0, 0], [0, .7]], R = [[.7, 0]];
+      ctx.lineWidth = s * .09; L.forEach(a => M.forEach(b => P([a, b]))); M.forEach(a => R.forEach(b => P([a, b])));
+      [...L, ...M, ...R].forEach(([x, y]) => dot(x, y, .16)); break; }
+    case 'doc':
+      ctx.beginPath(); rr(-.55 * s, -.78 * s, 1.1 * s, 1.56 * s, .18 * s); ctx.stroke();
+      for (const y of [-.3, .05, .4]) P([[-.28, y], [y > .3 ? .05 : .28, y]]); break;
+    case 'star': {
+      ctx.beginPath(); for (let k = 0; k < 10; k++){ const a = -Math.PI / 2 + k * Math.PI / 5, r = k & 1 ? .38 : .88; ctx.lineTo(Math.cos(a) * r * s, Math.sin(a) * r * s + .06 * s); }
+      ctx.closePath(); ctx.fill(); break; }
+    case 'people':
+      dot(0, -.36, .3); ctx.beginPath(); ctx.arc(0, .82 * s, .62 * s, Math.PI, 0); ctx.fill(); break;
+    case 'coin':
+      ctx.beginPath(); ctx.arc(0, 0, .74 * s, 0, TAU); ctx.stroke();
+      ctx.font = `800 ${Math.round(s * 1.05)}px ${PF}`; if (HAS_LS) ctx.letterSpacing = '0px';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('$', 0, s * .04); ctx.textBaseline = 'alphabetic'; break;
+    case 'cell':
+      ctx.lineWidth = s * .12; ctx.beginPath(); ctx.arc(0, 0, .78 * s, 0, TAU); ctx.stroke();
+      dot(.12, -.08, .3); ctx.globalAlpha *= .8; dot(-.42, .3, .09); dot(-.3, -.46, .07); dot(.46, .38, .08); break;
+  }
+  ctx.restore();
+}
+function appIcon(cx, cy, S){
+  if (S <= 0) return;
+  ctx.save(); ctx.shadowColor = 'rgba(49,130,246,.35)'; ctx.shadowBlur = S * .3; ctx.shadowOffsetY = S * .1;
+  const g = ctx.createLinearGradient(cx - S / 2, cy - S / 2, cx + S / 2, cy + S / 2); g.addColorStop(0, '#5AA0FF'); g.addColorStop(1, '#1B64DA');
+  ctx.fillStyle = g; rr(cx - S / 2, cy - S / 2, S, S, S * .28); ctx.fill(); ctx.restore();
+  glyph('cell', cx, cy, S * .36);
+}
+function toggle(x, y, on){
+  const w = 96, h = 58, o = clamp(on);
+  ctx.fillStyle = mix(C.grey2, C.blue, o); rr(x, y, w, h, h / 2); ctx.fill();
+  const kx = x + h / 2 + (w - h) * clamp(on, -.05, 1.08);
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(kx, y + h / 2, h / 2 - 5, 0, TAU); ctx.fill(); ctx.restore();
+}
+function pill(x, y, text, size, fg, bg, padX = 22, h = size * 2){
+  font(650, size); const w = ctx.measureText(text).width + padX * 2;
+  ctx.fillStyle = bg; rr(x, y, w, h, h / 2); ctx.fill();
+  ctx.fillStyle = fg; ctx.textAlign = 'left'; ctx.fillText(text, x + padX, y + h / 2 + size * .36);
+  return w;
+}
+/* rolling-digit odometer; non-digits in the template stay put */
+function odo(v, tpl, x, y, size, weight, color, align = 'left'){
+  font(weight, size); if (HAS_LS) ctx.letterSpacing = '0px';
+  const ch = [...tpl], dw = ctx.measureText('0').width;
+  const dot = ch.indexOf('.'), digits = ch.map((c, i) => /\d/.test(c) ? i : -1).filter(i => i >= 0);
+  const nInt = digits.filter(i => dot < 0 || i < dot).length;
+  const ws = ch.map(c => /\d/.test(c) ? dw : ctx.measureText(c).width), tot = ws.reduce((a, b) => a + b, 0);
+  let cx = align === 'right' ? x - tot : align === 'center' ? x - tot / 2 : x;
+  ctx.fillStyle = color; ctx.textAlign = 'center';
+  const lh = size * 1.15, ga = ctx.globalAlpha, pmin = -(digits.length - nInt), xu = v / Math.pow(10, pmin) + 1e-6;
+  ch.forEach((c, i) => {
+    if (/\d/.test(c)){
+      /* a real odometer: the lowest digit rolls continuously, each higher one only while the digits below pass 9 → 0 */
+      const j = digits.indexOf(i), p = j < nInt ? nInt - 1 - j : -(j - nInt + 1), step = Math.pow(10, p - pmin);
+      const n = Math.floor(xu / step), d = n % 10, f = step === 1 ? xu - n : clamp(xu - n * step - (step - 1));
+      const lead = p > 0 ? clamp(v / Math.pow(10, p) * 1.2) : 1;
+      ctx.save(); ctx.beginPath(); ctx.rect(cx - 2, y - size * .8, dw + 4, size * 1.02); ctx.clip();
+      ctx.globalAlpha = ga * lead;
+      ctx.fillText(String(d), cx + dw / 2, y - f * lh); ctx.fillText(String((d + 1) % 10), cx + dw / 2, y + lh - f * lh);
+      ctx.restore();
+    } else { ctx.textAlign = 'left'; ctx.fillText(c, cx, y); ctx.textAlign = 'center'; }
+    cx += ws[i];
+  });
+  ctx.textAlign = 'left';
+  return tot;
+}
+/* a card of rows: icon, title, subtitle and whatever the scene draws on the right */
+function listCard(t, t0, x, y, w, rows, rowH, right){
+  const p = sp(t, t0, .6); if (p <= 0) return;
+  const h = rows.length * rowH + 48;
+  A(fade(t, t0)); ctx.save(); ctx.translate(0, (1 - p) * 70);
+  card(x, y, w, h, 36);
+  rows.forEach((r, k) => {
+    const q = sp(t, t0 + .12 + k * .08, .5); if (q <= 0) return;
+    const cy = y + 24 + k * rowH + rowH / 2;
+    A(fade(t, t0 + .12 + k * .08)); ctx.save(); ctx.translate(0, (1 - q) * 28);
+    icon(r[0], x + 72, cy, 38 * Math.min(q, 1.1), r[r.length - 1]);
+    const tw = w - 140 - (right.w || 150);
+    fitFont(r[1], 750, 38, tw); ctx.fillStyle = C.ink; ctx.textAlign = 'left'; ctx.fillText(r[1], x + 132, cy - 4);
+    fitFont(r[2], 550, 26, tw); ctx.fillStyle = C.mute; ctx.fillText(r[2], x + 132, cy + 36);
+    right.draw(k, x + w - 40, cy, r);
+    ctx.restore();
+  });
+  ctx.restore(); A(1);
+}
+
+
+/* =================================================================== 3D OBJECTS (three.js)
+   Glossy clay-plastic and gold objects in the Toss 3D-emoji manner, rendered into a transparent
+   WebGL canvas and composited over the 2D frame. The camera is set so the z = 0 plane maps 1:1 to
+   canvas pixels, so objects are placed in the same pixel coordinates as the type. */
+let G3 = null;
+function init3D(){
+  if (!window.THREE) return;
+  try {
+    const TH = THREE, gl = document.createElement('canvas'); gl.width = W; gl.height = H;
+    const r = new TH.WebGLRenderer({ canvas: gl, alpha: true, antialias: true, preserveDrawingBuffer: true });
+    r.setPixelRatio(1); r.setSize(W, H, false); r.setClearColor(0x000000, 0);
+    r.toneMapping = TH.ACESFilmicToneMapping; r.toneMappingExposure = 1.0; r.outputColorSpace = TH.SRGBColorSpace;
+    const scene = new TH.Scene();
+    /* a small studio: bright soft boxes inside a pale room, prefiltered into an environment map */
+    const room = new TH.Scene();
+    room.add(new TH.Mesh(new TH.BoxGeometry(10, 10, 10), new TH.MeshBasicMaterial({ color: 0xdfe7f2, side: TH.BackSide })));
+    [[7, 3, 0, 4.9, 0, 5], [3, 4, -4.9, 1, 1, 3], [3, 5, 4.9, 0, 2, 2.2], [5, 2, 0, -1, 4.9, 1.6]].forEach(([w, h, x, y, z, k]) => {
+      const m = new TH.Mesh(new TH.PlaneGeometry(w, h), new TH.MeshBasicMaterial({ color: new TH.Color(k, k, k), side: TH.DoubleSide }));
+      m.position.set(x, y, z); m.lookAt(0, 0, 0); room.add(m);
+    });
+    const pm = new TH.PMREMGenerator(r); scene.environment = pm.fromScene(room, .04).texture;
+    const key = new TH.DirectionalLight(0xffffff, 1.4); key.position.set(-1.2, 2, 3); scene.add(key);
+    scene.add(new TH.AmbientLight(0xffffff, .25));
+    const fov = 16, dist = (H / 2) / Math.tan(fov * Math.PI / 360);
+    const cam = new TH.PerspectiveCamera(fov, W / H, dist * .3, dist * 3); cam.position.set(0, 0, dist);
+
+    const plastic = (c, rough = .3) => new TH.MeshPhysicalMaterial({ color: c, roughness: rough, metalness: 0, clearcoat: 1, clearcoatRoughness: .1 });
+    const gold = new TH.MeshPhysicalMaterial({ color: 0xFFC53D, roughness: .24, metalness: .9, clearcoat: .7, clearcoatRoughness: .1 });
+    const grp = (...ms) => { const g = new TH.Group(); ms.forEach(m => g.add(m)); return g; };
+    const mesh = (geo, mat, x = 0, y = 0, z = 0) => { const m = new TH.Mesh(geo, mat); m.position.set(x, y, z); return m; };
+
+    /* antibody: two heavy-chain arms, a stem and antigen-binding tips */
+    const blue = plastic(0x3182F6), sky = plastic(0x7DB8FF), yel = plastic(0xFFC53D, .25);
+    const arm = (sg) => { const m = mesh(new TH.CapsuleGeometry(.15, .62, 8, 24), blue, sg * .3, .3); m.rotation.z = -sg * .72; return m; };
+    const antibody = grp(mesh(new TH.CapsuleGeometry(.17, .7, 8, 24), sky, 0, -.48), arm(1), arm(-1),
+      mesh(new TH.SphereGeometry(.21, 32, 16), sky, 0, -.02),
+      mesh(new TH.SphereGeometry(.2, 32, 16), yel, .6, .6), mesh(new TH.SphereGeometry(.2, 32, 16), yel, -.6, .6));
+
+    /* DNA double helix */
+    const dna = new TH.Group(), bA = plastic(0x3182F6), bB = plastic(0x15C47E), rung = plastic(0xF4F6FA, .4);
+    for (let i = 0; i < 14; i++){
+      const a = i * .55, y = i * .16 - 1.04, x = Math.cos(a) * .36, z = Math.sin(a) * .36;
+      dna.add(mesh(new TH.SphereGeometry(.1, 20, 12), bA, x, y, z), mesh(new TH.SphereGeometry(.1, 20, 12), bB, -x, y, -z));
+      const c = mesh(new TH.CylinderGeometry(.035, .035, .72, 10), rung, 0, y, 0); c.rotation.z = Math.PI / 2; c.rotation.y = -a; dna.add(c);
+    }
+    dna.rotation.order = 'ZYX';
+
+    /* stack of gold coins with a raised rim on the top face */
+    const coins = new TH.Group();
+    for (let k = 0; k < 4; k++){ const c = mesh(new TH.CylinderGeometry(.5, .5, .13, 64), gold, (k % 2 ? .04 : -.03), k * .15 - .25); coins.add(c); }
+    const rim = mesh(new TH.TorusGeometry(.36, .04, 12, 64), gold, .04, .27); rim.rotation.x = Math.PI / 2; coins.add(rim);
+
+    /* rounded star */
+    const sh = new TH.Shape();
+    for (let k = 0; k < 10; k++){ const a = Math.PI / 2 + k * Math.PI / 5, rr = k & 1 ? .42 : .95; k ? sh.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : sh.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+    const sg = new TH.ExtrudeGeometry(sh, { depth: .28, bevelEnabled: true, bevelThickness: .12, bevelSize: .1, bevelSegments: 5, curveSegments: 4 }); sg.center();
+    const star = grp(mesh(sg, yel));
+
+    /* flask: lathe-turned glass with coloured liquid and rising bubbles */
+    const prof = [[0, -1], [.74, -1], [.8, -.93], [.74, -.8], [.22, .22], [.22, .78], [.3, .84], [.3, .92], [0, .92]].map(([x, y]) => new TH.Vector2(x, y));
+    const glass = new TH.MeshPhysicalMaterial({ color: 0xE8F3FF, roughness: .05, metalness: 0, clearcoat: 1, transparent: true, opacity: .38, depthWrite: false, side: TH.DoubleSide });
+    const liq = [[0, -.95], [.68, -.95], [.72, -.9], [.47, -.36], [0, -.36]].map(([x, y]) => new TH.Vector2(x, y));
+    const flask = grp(mesh(new TH.LatheGeometry(liq, 48), plastic(0x15C47E, .2)), mesh(new TH.LatheGeometry(prof, 48), glass));
+    flask.userData.bubbles = [0, 1, 2, 3].map(i => { const b = mesh(new TH.SphereGeometry(.05 + i * .012, 16, 8), plastic(0xFFFFFF, .2), (i - 1.5) * .15, -.8); flask.add(b); return b; });
+
+    /* map pin */
+    const red = plastic(0xF04452);
+    const cone = mesh(new TH.ConeGeometry(.44, .95, 48), red, 0, -.22); cone.rotation.x = Math.PI;
+    const pin = grp(mesh(new TH.SphereGeometry(.5, 48, 24), red, 0, .42), cone, mesh(new TH.SphereGeometry(.19, 32, 16), plastic(0xFFFFFF), 0, .46, .38));
+
+    /* graduation cap */
+    const navy = plastic(0x243B6B, .35);
+    const board = mesh(new TH.BoxGeometry(1.5, .09, 1.5), navy, 0, .32); board.rotation.y = Math.PI / 4;
+    const cord = mesh(new TH.CylinderGeometry(.025, .025, .6, 8), gold, .72, .06);
+    const cap = grp(mesh(new TH.CylinderGeometry(.5, .56, .42, 48), navy, 0, .06), board, mesh(new TH.SphereGeometry(.09, 16, 8), gold, 0, .4), cord,
+      mesh(new TH.SphereGeometry(.1, 16, 8), gold, .72, -.26));
+
+    const cellCols = [0x15C47E, 0xFE9800, 0x8B5CF6, 0xF04452];
+    const objs = { antibody, dna, coins, star, flask, pin, cap };
+    cellCols.forEach((c, i) => { objs['cell' + i] = grp(mesh(new TH.SphereGeometry(1, 48, 24), plastic(c, .22))); });
+    Object.values(objs).forEach(o => scene.add(o));
+    G3 = { r, scene, cam, gl, objs, sh: [] };
+  } catch (e){ G3 = null; }
+}
+function begin3D(){ if (!G3) return; for (const o of Object.values(G3.objs)) o.visible = false; G3.sh = []; }
+/* place an object: pixel position, pixel size, pop (0–1+, springy), rotation */
+function put(name, x, y, size, pop, rx = 0, ry = 0, rz = 0, shadow = true){
+  if (!G3 || pop <= .001) return;
+  const o = G3.objs[name]; o.visible = true;
+  o.position.set(x - W / 2, H / 2 - y, 0); o.scale.setScalar(size / 2 * pop); o.rotation.set(rx, ry, rz);
+  if (shadow) G3.sh.push([x, y + size * .6, size * .34 * Math.min(1, pop), clamp(pop)]);
+}
+function end3D(){
+  if (!G3 || !G3.sh.length && !Object.values(G3.objs).some(o => o.visible)) return;
+  G3.sh.forEach(([x, y, rx, a]) => {
+    ctx.save(); ctx.translate(x, y); ctx.scale(1, .22);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(2,32,71,${.16 * a})`); g.addColorStop(1, 'rgba(2,32,71,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rx, 0, TAU); ctx.fill(); ctx.restore();
+  });
+  G3.r.render(G3.scene, G3.cam);
+  ctx.drawImage(G3.gl, 0, 0);
+}
+const bob = (t, k = 0, a = 8) => Math.sin(t * 2.4 + k * 1.7) * a;
+
+/* =================================================================== SCENES */
+
+/* 0–2.5 · hello */
+function s1(t){
+  const icx = W / 2, icy = PORT ? 620 : 285, S = PORT ? 250 : 200;
+  const p = sp(t, .06, .6);
+  if (G3){
+    put('antibody', icx, icy + bob(t), S * 1.35, p, .15, t * 1.3 + (1 - p) * 2.5, Math.sin(t * 1.6) * .08);
+    [[-1.3, -.3], [1.28, -.48], [1.12, .55], [-1.12, .62]].forEach(([dx, dy], i) => {
+      const q = sp(t, .28 + i * .07, .6);
+      put('cell' + i, icx + dx * S * q, icy + dy * S * q + bob(t, i + 1, 7), S * .2, q, 0, t, 0, false);
+    });
+  } else { A(fade(t, .06, .15)); ctx.save(); ctx.translate(icx, icy); ctx.scale(p, p); appIcon(0, 0, S); ctx.restore(); }
+  const y1 = PORT ? 960 : 520, y2 = PORT ? 1110 : 660, y3 = PORT ? 1205 : 750;
+  lineIn([[T.s1a, C.sub]], W / 2, y1, 76, 700, t, .42, 'center');
+  lineIn(T.s1b, W / 2, y2, PORT ? 132 : 128, 800, t, .56, 'center');
+  lineIn([[T.s1c, C.mute]], W / 2, y3, 40, 600, t, .9, 'center');
+  const u = fade(t, 1.15, .45);
+  if (u > 0){
+    font(800, PORT ? 132 : 128); const str = T.s1b.map(s => s[0]).join('');
+    let sz = fitFont(str, 800, PORT ? 132 : 128, W - 2 * MX); const tw = ctx.measureText(str).width;
+    const nw = ctx.measureText(T.s1b[0][0]).width, x0 = W / 2 - tw / 2;
+    A(.35 * u); ctx.fillStyle = C.blue; rr(x0, y2 + sz * .12, nw * u, sz * .1, sz * .05); ctx.fill(); A(1);
+  }
+}
+
+/* 2.5–5 · what I do: toggles switch on one by one */
+function s2(t){
+  const hx = MX, y1 = PORT ? 330 : 420, lh = PORT ? 116 : 112, sz = PORT ? 96 : 92;
+  const colW = PORT ? W - 2 * MX : 820;
+  T.s2.forEach((segs, k) => lineIn(segs, hx, y1 + k * lh, sz, 800, t, 2.55 + k * .1, 'left', colW));
+  lineIn([[T.s2sub, C.mute]], hx, y1 + lh * 2 - 16, 34, 600, t, 2.8, 'left', colW);
+  const rowH = PORT ? 176 : 150, cw = PORT ? W - 2 * MX : 770, cx = PORT ? MX : 1010;
+  const cy = PORT ? 690 : (H - (4 * rowH + 48)) / 2;
+  put('dna', PORT ? W / 2 : 470, (PORT ? 1650 : 850) + bob(t, 0, 6), PORT ? 740 : 540, sp(t, 2.9, .7), 0, t * 1.6, Math.PI / 2 - .1);
+  listCard(t, 2.62, cx, cy, cw, T.s2rows, rowH, {
+    w: 140, draw: (k, rx, y) => toggle(rx - 96, y - 29, sp(t, 3.3 + k * .28, .45))
+  });
+}
+
+/* 5–8 · output: balance-style big number and a ledger of rows */
+function s3(t){
+  const hx = MX, colW = PORT ? W - 2 * MX : 800;
+  const yl = PORT ? 300 : 330, yb = PORT ? 520 : 560, yc = PORT ? 570 : 610;
+  lineIn([[T.s3lab, C.sub]], hx, yl, 44, 700, t, 5.05);
+  const bp = inv(5.12, 5.3, t);
+  if (bp > 0){
+    A(fade(t, 5.12)); ctx.save(); ctx.translate(0, (1 - spring(bp)) * 40);
+    const size = PORT ? 230 : 250, v = 18 * eOut5(inv(5.15, 5.95, t));
+    const w = odo(v, T.s3big, hx - 6, yb, size, 800, C.ink);
+    if (T.s3suf){ font(800, size * .55); ctx.fillStyle = C.ink; ctx.fillText(T.s3suf, hx + w + 12, yb); }
+    ctx.restore(); A(1);
+  }
+  const cp = sp(t, 5.5, .5);
+  if (cp > 0){ A(fade(t, 5.5)); ctx.save(); ctx.translate(0, (1 - cp) * 20); pill(hx, yc, T.s3chip, 30, C.sub, C.grey, 24, 62); ctx.restore(); A(1); }
+  const rowH = PORT ? 176 : 150, cw = PORT ? W - 2 * MX : 770, cx = PORT ? MX : 1010;
+  const cy = PORT ? 740 : (H - (4 * rowH + 48)) / 2;
+  put('coins', PORT ? 330 : 300, (PORT ? 1700 : 860) + bob(t, 0, 5), PORT ? 250 : 230, sp(t, 5.6, .7), .5, t * 1.1);
+  put('star', PORT ? 730 : 580, (PORT ? 1680 : 830) + bob(t, 1, 8), PORT ? 200 : 170, sp(t, 5.78, .7), 0, Math.sin(t * 2) * .55, .12);
+  listCard(t, 5.35, cx, cy, cw, T.s3rows, rowH, {
+    w: 170, draw: (k, rx, y, r) => {
+      const tpl = r[3], target = parseFloat(tpl.replace(/[^\d.]/g, ''));
+      odo(target * eOut5(inv(5.7 + k * .15, 6.4 + k * .15, t)), tpl, rx, y + 16, 46, 800, k === 2 ? C.blue : C.ink, 'right');
+    }
+  });
+}
+
+/* 8–11 · journals: swipe carousel landing on Nature Immunology */
+const focusAt = t => 5 * eOut5(inv(8.15, 9.85, t));
+function s4(t){
+  lineIn([[T.s4head, C.ink]], W / 2, PORT ? 300 : 190, PORT ? 76 : 64, 800, t, 8.05, 'center');
+  const cw = PORT ? 760 : 540, ch = PORT ? 880 : 600, gap = PORT ? 40 : 36, ccy = PORT ? 1060 : 590;
+  const f = focusAt(t), enter = sp(t, 8.08, .6);
+  A(fade(t, 8.08)); ctx.save(); ctx.translate((1 - enter) * 200, 0);
+  JN.forEach((J, i) => {
+    const off = (i - f) * (cw + gap), d = Math.min(1, Math.abs(i - f));
+    if (Math.abs(off) > W / 2 + cw) return;
+    const s = 1 - .08 * d, isNI = i === 5, b = isNI ? eOut3(inv(9.7, 10.0, t)) : 0;
+    ctx.save(); ctx.translate(W / 2 + off, ccy); ctx.scale(s, s);
+    const x0 = -cw / 2, y0 = -ch / 2, ga = GA * (1 - .45 * d);
+    ctx.globalAlpha = ga;
+    card(x0, y0, cw, ch, 44, b > 0 ? mix('#FFFFFF', C.blue, b) : C.bg);
+    icon('doc', x0 + 84, y0 + 96, 42, isNI ? mix(C.blue, '#8FC0FF', b) : J[4]);
+    font(600, 34); ctx.fillStyle = mix(C.mute, '#D6E6FF', b); ctx.textAlign = 'left'; ctx.fillText(J[1], x0 + 48, y0 + 216);
+    const ns = fitFont(J[0], 800, PORT ? 84 : 60, cw - 96); ctx.fillStyle = mix(C.ink, '#FFFFFF', b); ctx.fillText(J[0], x0 + 48, y0 + 216 + ns * 1.25);
+    if (isNI){
+      const n = fade(t, 10.05, .3);
+      if (n > 0){ ctx.globalAlpha = ga * n; font(550, PORT ? 30 : 25); ctx.fillStyle = '#D6E6FF'; ctx.fillText(T.s4note, x0 + 48, y0 + 216 + ns * 1.25 + 56); ctx.globalAlpha = ga; }
+    }
+    if (J[2]){
+      const bp = isNI ? sp(t, 9.95, .5) : 1;
+      ctx.save(); ctx.translate(x0 + 48, y0 + ch - 190); ctx.scale(bp, bp);
+      pill(0, 0, J[2], PORT ? 30 : 26, isNI ? C.blue : C.sub, isNI ? mix(C.grey, '#FFFFFF', b) : C.grey, 22, PORT ? 60 : 54);
+      ctx.restore();
+    }
+    font(750, PORT ? 38 : 32); ctx.fillStyle = mix(C.blue, '#FFFFFF', b); ctx.fillText(J[3], x0 + 48, y0 + ch - 70);
+    ctx.restore();
+  });
+  ctx.restore();
+  put('star', PORT ? W / 2 + 350 : W / 2 + 255, (PORT ? 640 : 305) + bob(t, 2, 5), PORT ? 190 : 160, sp(t, 10.0, .6), 0, Math.sin(t * 3) * .45, -.15);
+  const dy = PORT ? 1580 : 960; let dx = W / 2 - (JN.length * 26 + 30) / 2;
+  JN.forEach((_, i) => {
+    const a = clamp(1 - Math.abs(i - f)), w = 12 + 30 * a;
+    ctx.fillStyle = mix(C.grey2, C.blue, a); rr(dx, dy - 6, w, 12, 6); ctx.fill(); dx += w + 14;
+  });
+  A(1);
+}
+
+/* 11–14 · toolkit: tiles and a segmented control that switches Measure → Model */
+function s5(t){
+  const hx = MX, y1 = PORT ? 320 : 400, lh = PORT ? 112 : 110, sz = PORT ? 92 : 90, colW = PORT ? W - 2 * MX : 800;
+  T.s5.forEach((segs, k) => lineIn(segs, hx, y1 + k * lh, sz, 800, t, 11.05 + k * .1, 'left', colW));
+  const sel = sp(t, 12.75, .45), hA = eOut3(inv(11.9, 12.2, t)) * (1 - clamp(sel)), hB = clamp(sel);
+  const sgp = sp(t, 11.35, .5);
+  if (sgp > 0){
+    const sx = hx, sy = PORT ? 470 : 580, sw = PORT ? 520 : 460, sh = 84;
+    A(fade(t, 11.35)); ctx.save(); ctx.translate(0, (1 - sgp) * 24);
+    ctx.fillStyle = C.grey; rr(sx, sy, sw, sh, sh / 2); ctx.fill();
+    const kw = sw / 2 - 8, kx = sx + 8 + (sw / 2) * clamp(sel, -.04, 1.04);
+    card(kx, sy + 8, kw, sh - 16, (sh - 16) / 2, C.bg, true);
+    T.seg.forEach((s, k) => {
+      const on = k === 0 ? 1 - clamp(sel) : clamp(sel);
+      font(on > .5 ? 750 : 600, 32); ctx.fillStyle = mix(C.mute, C.ink, on); ctx.textAlign = 'center';
+      ctx.fillText(s, sx + sw / 4 + k * sw / 2, sy + sh / 2 + 11);
+    });
+    ctx.textAlign = 'left'; ctx.restore(); A(1);
+  }
+  if (G3){ G3.objs.flask.userData.bubbles.forEach((b, i) => { b.position.y = -.85 + ((t * .5 + i * .23) % .5); }); }
+  put('flask', PORT ? 800 : 340, (PORT ? 1770 : 870) + bob(t, 0, 6), PORT ? 230 : 270, sp(t, 11.5, .7), .1, t * .9, Math.sin(t * 2) * .1);
+  put('cell0', PORT ? 330 : 560, (PORT ? 1790 : 900) + bob(t, 2, 9), PORT ? 90 : 80, sp(t, 11.7, .6), 0, t);
+  const gx = PORT ? MX : 1010, gy = PORT ? 640 : 194, gap = PORT ? 28 : 30;
+  const tw = PORT ? (W - 2 * MX - 2 * gap) / 3 : 236, th = PORT ? 300 : 210;
+  TOOLS.forEach((tl, k) => {
+    const q = sp(t, 11.15 + k * .05, .5); if (q <= 0) return;
+    const col = k % 3, row = Math.floor(k / 3), x = gx + col * (tw + gap), y = gy + row * (th + gap);
+    const h = tl[2] ? hB : hA;
+    A(fade(t, 11.15 + k * .05)); ctx.save(); ctx.translate(x + tw / 2, y + th / 2); ctx.scale(.9 + .1 * q, .9 + .1 * q); ctx.translate(-x - tw / 2, -y - th / 2);
+    ctx.fillStyle = mix(C.grey, C.blueL, h); rr(x, y, tw, th, 30); ctx.fill();
+    icon(tl[1], x + 56, y + 60, 32, TCOL[k]);
+    fitFont(tl[0], 750, PORT ? 36 : 31, tw - 56); ctx.fillStyle = mix(C.ink, C.blue, h); ctx.textAlign = 'left'; ctx.fillText(tl[0], x + 28, y + th - 58);
+    font(600, PORT ? 26 : 22); ctx.fillStyle = mix(C.mute, C.blue, h * .8); ctx.fillText(T.seg[tl[2]], x + 28, y + th - 24);
+    ctx.restore();
+  });
+  A(1);
+}
+
+/* 14–17 · career: a rolling year and a timeline list */
+function s6(t){
+  const hx = MX;
+  lineIn([[T.s6head, C.ink]], hx, PORT ? 300 : 360, PORT ? 92 : 88, 800, t, 14.05);
+  const P = eIO(inv(14.35, 16.55, t)), fi = P * (T.tl.length - 1), a = Math.floor(fi), b = Math.min(T.tl.length - 1, a + 1);
+  const yv = lerp(+T.tl[a][0], +T.tl[b][0], fi - a);
+  const yp = sp(t, 14.15, .5);
+  if (yp > 0){
+    A(fade(t, 14.15)); ctx.save(); ctx.translate(0, (1 - yp) * 40);
+    odo(yv, '2026', hx - 4, PORT ? 500 : 590, PORT ? 180 : 210, 800, C.blue);
+    const act = T.tl[Math.round(fi)];
+    font(700, 36); ctx.fillStyle = C.sub; if (!PORT) ctx.fillText(fitStr(act[1], 750), hx, 670);
+    ctx.restore(); A(1);
+  }
+  put('cap', PORT ? 700 : 360, (PORT ? 420 : 870) + bob(t, 0, 6), PORT ? 180 : 230, sp(t, 14.3, .7), .38, t * .8);
+  put('pin', PORT ? 905 : 640, (PORT ? 390 : 850) + bob(t, 1, 9), PORT ? 170 : 200, sp(t, 14.45, .7), .1, t * 1.5);
+  const px = PORT ? MX : 1010, py = PORT ? 580 : 140, pw = PORT ? W - 2 * MX : 770, ph = PORT ? 1220 : 800, rowH = PORT ? 166 : 150;
+  const cp = sp(t, 14.1, .6); if (cp <= 0) return;
+  A(fade(t, 14.1)); ctx.save(); ctx.translate(0, (1 - cp) * 70);
+  card(px, py, pw, ph, 36);
+  ctx.save(); rr(px, py, pw, ph, 36); ctx.clip();
+  const content = T.tl.length * rowH + 40, scroll = Math.max(0, content - ph + 40) * P;
+  const lx = px + 78, top = py + 40 - scroll;
+  ctx.fillStyle = C.grey2; ctx.fillRect(lx - 2, top + rowH / 2, 4, (T.tl.length - 1) * rowH);
+  ctx.fillStyle = C.blue; ctx.fillRect(lx - 2, top + rowH / 2, 4, fi * rowH);
+  T.tl.forEach((r, k) => {
+    const q = sp(t, 14.2 + k * .07, .5); if (q <= 0) return;
+    const cy = top + k * rowH + rowH / 2, on = clamp(fi - k + 1), cur = clamp(1 - Math.abs(fi - k) * 1.6);
+    A(fade(t, 14.2 + k * .07)); ctx.save(); ctx.translate((1 - q) * 50, 0);
+    if (cur > 0){ ctx.globalAlpha *= .18 * cur; ctx.fillStyle = C.blue; ctx.beginPath(); ctx.arc(lx, cy, 30, 0, TAU); ctx.fill(); A(fade(t, 14.2 + k * .07)); }
+    ctx.fillStyle = mix(C.grey2, C.blue, on); ctx.beginPath(); ctx.arc(lx, cy, 12 + 5 * cur, 0, TAU); ctx.fill();
+    font(750, 30); ctx.fillStyle = mix(C.mute, C.blue, on); ctx.textAlign = 'left'; ctx.fillText(r[0], lx + 50, cy - 22);
+    fitFont(r[1], 800, 38, pw - 170); ctx.fillStyle = C.ink; ctx.fillText(r[1], lx + 50, cy + 20);
+    fitFont(r[2], 550, 27, pw - 170); ctx.fillStyle = C.mute; ctx.fillText(r[2], lx + 50, cy + 58);
+    ctx.restore();
+  });
+  ctx.restore(); ctx.restore(); A(1);
+}
+function fitStr(s, maxW){ let o = s; while (ctx.measureText(o).width > maxW && o.length > 2) o = o.slice(0, -2) + '…'; return o; }
+
+/* 17–20 · outro: icon, name, CTA button with a press */
+function s7(t){
+  const icx = W / 2, icy = PORT ? 600 : 250, S = PORT ? 220 : 170;
+  const p = sp(t, 17.05, .6);
+  if (G3){
+    put('antibody', icx, icy + bob(t), S * 1.55, p, .15, t * 1.3 + (1 - p) * 2.5, Math.sin(t * 1.6) * .08);
+    [[-1.5, -.2], [1.45, -.4], [1.3, .5], [-1.25, .55]].forEach(([dx, dy], i) => {
+      const q = sp(t, 17.2 + i * .06, .6);
+      put('cell' + i, icx + dx * S * q, icy + dy * S * q + bob(t, i + 1, 7), S * .22, q, 0, t, 0, false);
+    });
+  } else { A(fade(t, 17.05, .15)); ctx.save(); ctx.translate(icx, icy); ctx.scale(p, p); appIcon(0, 0, S); ctx.restore(); A(1); }
+  lineIn([[T.s7name, C.ink]], W / 2, PORT ? 880 : 470, PORT ? 150 : 140, 800, t, 17.2, 'center');
+  lineIn([[T.s7sub, C.mute]], W / 2, PORT ? 970 : 550, 40, 600, t, 17.35, 'center');
+  const bp = sp(t, 17.5, .6); if (bp <= 0) return;
+  const bw = PORT ? W - 2 * MX : 760, bh = PORT ? 136 : 112, bx = W / 2 - bw / 2, by = PORT ? 1600 : 650;
+  const press = Math.sin(Math.PI * inv(18.9, 19.12, t)) * .04;
+  A(fade(t, 17.5)); ctx.save(); ctx.translate(W / 2, by + bh / 2); ctx.scale(1 - press, 1 - press); ctx.translate(0, (1 - bp) * 50);
+  ctx.save(); ctx.shadowColor = 'rgba(49,130,246,.3)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 12;
+  ctx.fillStyle = mix(C.blue, '#1B64DA', press * 20); rr(-bw / 2, -bh / 2, bw, bh, PORT ? 28 : 24); ctx.fill(); ctx.restore();
+  const rp = inv(18.9, 19.5, t);
+  if (rp > 0 && rp < 1){ ctx.save(); rr(-bw / 2, -bh / 2, bw, bh, 24); ctx.clip(); ctx.globalAlpha *= .25 * (1 - rp); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, bw * .7 * eOut3(rp), 0, TAU); ctx.fill(); ctx.restore(); }
+  fitFont(T.cta, 750, PORT ? 44 : 38, bw - 80); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(T.cta, 0, (PORT ? 44 : 38) * .36);
+  ctx.restore(); A(1);
+  lineIn([[T.s7foot, C.mute]], W / 2, PORT ? 1810 : 830, 30, 600, t, 17.7, 'center');
+}
+
+const SCENES = [[0, 2.5, s1], [2.5, 5, s2], [5, 8, s3], [8, 11, s4], [11, 14, s5], [14, 17, s6], [17, 20, s7]];
+function render(t){
+  t = clamp(t, 0, DUR);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+  const [a, b, fn] = SCENES.find(s => t < s[1]) || SCENES[SCENES.length - 1];
+  const out = b < DUR ? eIn3(inv(b - .2, b, t)) : 0;
+  GA = 1 - out; ctx.save(); ctx.translate(0, -out * 90); A(1);
+  begin3D(); fn(t); A(1); end3D();
+  ctx.restore(); GA = 1; ctx.globalAlpha = 1;
+}
+
+/* =================================================================== SOUND (synthesized; the same cue sheet drives live play and the offline MP4 mix) */
+function buildSound(ac, out, t0, T0){
+  const noise = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+  const nd = noise.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  const at = e => T0 + (e - t0);
+  const env = (g, T, a, dec, att = .004) => { g.gain.setValueAtTime(.0001, T); g.gain.exponentialRampToValueAtTime(a, T + att); g.gain.exponentialRampToValueAtTime(.0001, T + dec); };
+  const osc = (e, type, f, a, dec, f2, fdur) => {
+    if (e < t0) return; const T = at(e), o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, T); if (f2) o.frequency.exponentialRampToValueAtTime(f2, T + fdur);
+    env(g, T, a, dec); o.connect(g).connect(out); o.start(T); o.stop(T + dec + .03);
+  };
+  const nz = (e, type, f, q, a, dec) => {
+    if (e < t0) return; const T = at(e), s = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain();
+    s.buffer = noise; fl.type = type; fl.frequency.value = f; fl.Q.value = q; env(g, T, a, dec);
+    s.connect(fl).connect(g).connect(out); s.start(T, Math.random()); s.stop(T + dec + .03);
+  };
+  const pluck = (e, f, a = .09) => { osc(e, 'triangle', f, a, .42); osc(e, 'sine', f * 2, a * .35, .22); };
+  const kick = (e, a = .55) => osc(e, 'sine', 120, a, .32, 46, .12);
+  const hat = (e, a = .035) => nz(e, 'highpass', 9000, .7, a, .03);
+  const clap = (e, a = .1) => nz(e, 'bandpass', 2000, .8, a, .11);
+  const pop = (e, f = 540, a = .12) => osc(e, 'sine', f, a, .13, f * 2.1, .07);
+  const tick = (e, a = .035) => osc(e, 'square', 2600, a, .018);
+  const bass = (e, f, a = .2) => osc(e, 'sine', f, a, .45);
+  const swish = (e, len = .45, a = .09) => {
+    if (e < t0) return; const T = at(e), s = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain();
+    s.buffer = noise; fl.type = 'bandpass'; fl.Q.value = 1.4; fl.frequency.setValueAtTime(700, T); fl.frequency.exponentialRampToValueAtTime(4200, T + len * .6);
+    g.gain.setValueAtTime(.0001, T); g.gain.exponentialRampToValueAtTime(a, T + len * .5); g.gain.exponentialRampToValueAtTime(.0001, T + len);
+    s.connect(fl).connect(g).connect(out); s.start(T, Math.random()); s.stop(T + len + .03);
+  };
+  const pad = (e, fs, len, a = .035) => fs.forEach((f, k) => {
+    if (e < t0) return; const T = at(e), o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = f; o.detune.value = (k - 1.5) * 4;
+    g.gain.setValueAtTime(.0001, T); g.gain.exponentialRampToValueAtTime(a, T + .08); g.gain.exponentialRampToValueAtTime(.0001, T + len);
+    o.connect(g).connect(out); o.start(T); o.stop(T + len + .03);
+  });
+
+  /* 120 BPM, F major: F – Dm – B♭ – C, one chord per bar of two seconds */
+  const CH = [[349.23, 440, 523.25, 659.25], [293.66, 349.23, 440, 523.25], [293.66, 349.23, 466.16, 587.33], [329.63, 392, 523.25, 659.25]];
+  const ROOT = [87.31, 73.42, 58.27, 65.41], ARP = [0, 2, 1, 3, 2, 1, 3, 2];
+  for (let e = 0; e < 19.5; e += .25){
+    const bar = Math.floor(e / 2) % 4, n = Math.round(e / .25) % 8;
+    if (e >= 17 && n % 2) continue;
+    pluck(e, CH[bar][ARP[n]], e < 2.5 ? .06 : e >= 17 ? .05 : .08);
+  }
+  for (let e = 2.5; e < 16.99; e += .5){
+    const beat = Math.round(e / .5);
+    kick(e); if (beat % 2) clap(e); hat(e + .25);
+    if (beat % 2 === 1) bass(e, ROOT[Math.floor(e / 2) % 4]);
+  }
+  for (let e = 0; e < 2.5; e += 1) bass(e, ROOT[Math.floor(e / 2) % 4], .14);
+
+  /* UI sounds, one per animated event */
+  pop(.08, 440, .16); [.28, .35, .42, .49].forEach((e, k) => pop(e, 620 + k * 90, .08)); pop(.56, 520, .09);
+  [3.3, 3.58, 3.86, 4.14].forEach((e, k) => { pop(e, 660 + k * 110, .13); tick(e + .02); });
+  for (let e = 5.15; e < 5.95; e += .05) tick(e, .025);
+  [5.7, 5.85, 6.0, 6.15].forEach((e, k) => { for (let j = 0; j < 8; j++) tick(e + j * .06, .02); pop(e + .5, 720 + k * 80, .07); });
+  swish(8.1, .9, .1); pop(9.85, 480, .14); pop(9.97, 880, .12);
+  for (let k = 0; k < 9; k++) pop(11.15 + k * .05, 500 + k * 45, .06);
+  pop(12.75, 700, .12); tick(12.76, .04);
+  for (let e = 14.35; e < 16.55; e += .09) tick(e, .018);
+  for (let k = 0; k < 7; k++) pop(14.2 + k * .07, 560 + k * 60, .05);
+  pop(17.06, 440, .16); pad(17.05, [349.23, 440, 523.25, 783.99], 2.9);
+  tick(18.9, .06); pop(18.92, 900, .12);
+}
+function wavBase64(buf){
+  const ch = buf.numberOfChannels, len = buf.length, sr = buf.sampleRate, dv = new DataView(new ArrayBuffer(44 + len * ch * 2));
+  const ws = (o, s) => [...s].forEach((c, i) => dv.setUint8(o + i, c.charCodeAt(0)));
+  ws(0, 'RIFF'); dv.setUint32(4, 36 + len * ch * 2, true); ws(8, 'WAVE'); ws(12, 'fmt ');
+  dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, ch, true); dv.setUint32(24, sr, true);
+  dv.setUint32(28, sr * ch * 2, true); dv.setUint16(32, ch * 2, true); dv.setUint16(34, 16, true); ws(36, 'data'); dv.setUint32(40, len * ch * 2, true);
+  const data = [...Array(ch)].map((_, c) => buf.getChannelData(c));
+  let o = 44; for (let i = 0; i < len; i++) for (let c = 0; c < ch; c++){ dv.setInt16(o, clamp(data[c][i], -1, 1) * 32767, true); o += 2; }
+  const u8 = new Uint8Array(dv.buffer); let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+function masterChain(ac, dest){
+  const g = ac.createGain(); g.gain.value = .9;
+  const comp = ac.createDynamicsCompressor(); comp.threshold.value = -12; comp.ratio.value = 3;
+  g.connect(comp); comp.connect(dest); return g;
+}
+
+/* =================================================================== PLAYER
+   No visible controls. Autoplays muted and loops (browsers block sound until a gesture); the first
+   click or key restarts from 0:00 with sound. Space pauses, arrows step 0.5 s, F toggles fullscreen,
+   M mutes. ?t=<sec> opens paused on that frame. */
+let actx = null, master = null, bus = null, audioBase = null, soundOn = true;
+function ensureAudio(){ if (actx) return; try { actx = new (window.AudioContext || window.webkitAudioContext)(); master = masterChain(actx, actx.destination); } catch (e){ actx = null; } }
+function scheduleFrom(t0){
+  if (!actx) return; stopAudio();
+  bus = actx.createGain(); bus.gain.value = soundOn ? 1 : 0; bus.connect(master);
+  const T0 = actx.currentTime + .06; audioBase = { T0, t0 }; buildSound(actx, bus, t0, T0);
+}
+function stopAudio(){ if (bus){ try { bus.disconnect(); } catch (e){} bus = null; } audioBase = null; }
+
+const stage = document.getElementById('stage');
+const qT = parseFloat(Q.get('t')), still = Number.isFinite(qT);
+let playing = false, playhead = still ? clamp(qT, 0, DUR) : 0, lastPerf = 0, dirty = true, armed = false, holdUntil = 0;
+function play(){ if (actx && actx.state === 'suspended') actx.resume(); if (playhead >= DUR - .01) playhead = 0; scheduleFrom(playhead); playing = true; lastPerf = performance.now(); }
+function pause(){ playing = false; stopAudio(); dirty = true; }
+function seek(t){ playhead = clamp(t, 0, DUR); if (playing) scheduleFrom(playhead); dirty = true; }
+function arm(){ if (armed) return; armed = true; ensureAudio(); playhead = 0; play(); }
+function loop(now){
+  if (playing){
+    if (actx && actx.state === 'running' && audioBase) playhead = Math.max(audioBase.t0, audioBase.t0 + (actx.currentTime - audioBase.T0));
+    else playhead += (now - lastPerf) / 1000;
+    lastPerf = now;
+    if (playhead >= DUR){ playhead = DUR; playing = false; stopAudio(); holdUntil = now + 1000; }
+    render(playhead);
+  } else if (holdUntil && now >= holdUntil){ holdUntil = 0; playhead = 0; play(); }
+  else if (dirty){ render(playhead); dirty = false; }
+  requestAnimationFrame(loop);
+}
+function toggleFs(){
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else (stage.requestFullscreen || stage.webkitRequestFullscreen).call(stage);
+  } catch (e){}
+}
+stage.addEventListener('click', () => { if (!armed) arm(); else playing ? pause() : (holdUntil = 0, play()); });
+stage.addEventListener('dblclick', toggleFs);
+document.addEventListener('keydown', e => {
+  if (!armed){ arm(); if (e.key === ' ') e.preventDefault(); return; }
+  if (e.key === ' '){ e.preventDefault(); playing ? pause() : (holdUntil = 0, play()); }
+  else if (e.key === 'ArrowRight') seek(playhead + .5);
+  else if (e.key === 'ArrowLeft') seek(playhead - .5);
+  else if (e.key === 'f' || e.key === 'F') toggleFs();
+  else if (e.key === 'm' || e.key === 'M'){ soundOn = !soundOn; if (bus) bus.gain.setTargetAtTime(soundOn ? 1 : 0, actx.currentTime, .02); }
+});
+let idleT; document.addEventListener('mousemove', () => { stage.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => stage.classList.add('idle'), 1500); });
+
+/* fonts: ask for every glyph the copy uses so the dynamic subsets are in before the first frame */
+const ALL = JSON.stringify(T) + JSON.stringify(JN) + JSON.stringify(TOOLS) + '0123456789$+.·…';
+const ready = Promise.race([
+  Promise.all([500, 550, 600, 650, 700, 750, 800].map(w => document.fonts ? document.fonts.load(`${w} 60px "Pretendard Variable"`, ALL) : null)),
+  new Promise(r => setTimeout(r, 6000))
+]).catch(() => {});
+
+/* hooks for the offline MP4 renderer */
+window.reel = {
+  W, H, fps: 30, duration: DUR, ready,
+  frame: (t, q = .95) => { render(t); return cv.toDataURL('image/jpeg', q); },
+  audioWav: async () => {
+    const oac = new OfflineAudioContext(2, 44100 * DUR, 44100);
+    buildSound(oac, masterChain(oac, oac.destination), 0, 0);
+    return wavBase64(await oac.startRendering());
+  }
+};
+ready.then(() => { init3D(); dirty = true; if (!still) play(); requestAnimationFrame(loop); });
+render(playhead);
+})();

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{color-scheme:light}
+html,body{height:100%;margin:0;background:#fff;overflow:hidden}
+.stage{position:fixed;inset:0;display:grid;place-items:center;background:#fff;cursor:pointer}
+.stage canvas{display:block;width:min(100vw,calc(100vh * {{ratio}}));height:auto;max-width:100%}
+.stage.idle{cursor:none}
+</style>
+</head>
+<body>
+<!-- Built from src/ by build.py. Edit src/reel.js, not this file. -->
+<div class="stage" id="stage">
+  <canvas id="cv" aria-label="{{aria}}"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script>window.REEL_CFG = {{cfg}};</script>
+<script>
+{{js}}
+</script>
+</body>
+</html>
