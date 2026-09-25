@@ -1,7 +1,25 @@
 (() => {
 const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d');
-const W = 1920, H = 1080, DUR = 15, TAU = Math.PI * 2, N = 1400;
+const W = 1920, H = 1080, SD = 15, TAU = Math.PI * 2, N = 1400;
+/* The scenes are authored on a 15-second clock (t). The 30-second cut plays them through a
+   piecewise-linear time warp: action (implosion, slams, cuts) runs near full speed and the
+   moments that carry text are stretched so they can be read. DUR is the real running time. */
+const LONG = document.documentElement.dataset.cut === '30' || new URLSearchParams(location.search).get('cut') === '30';
+const DUR = LONG ? 30 : SD;
+const WK = LONG ? [
+  [0, 0], [1.5, .9], [1.9, 1.3], [3.0, 1.7], [3.5, 2.0],                  // open: slam at full speed, name held
+  [4.7, 2.9], [5.5, 3.6], [7.6, 4.15], [8.0, 4.5],                        // profile: headline + labels, then a long read
+  ...[0, 1, 2, 3].flatMap(k => [[8.4 + k, 4.82 + k * .5], [8.85 + k, 4.9 + k * .5], [9 + k, 5 + k * .5]]), // one metric per second
+  [12.5, 6.84], [13.2, 6.88], [13.5, 7.0],                                 // ledger
+  [15.5, 8.6], [17.2, 9.3], [17.5, 9.5],                                   // journals: slower scroll, long lock
+  [18.7, 10.2], [20.6, 11.3], [21.6, 11.8], [22, 12],                      // spatial scan + toolchain
+  [26, 13.4], [26.5, 13.5],                                                // career, one year per beat pair
+  [27.5, 14.35], [28.3, 14.8], [30, 15]                                    // outro, long hold
+] : [[0, 0], [SD, SD]];
+function warp(T){ for (let k = 1; k < WK.length; k++) if (T <= WK[k][0]){ const [a, x] = WK[k - 1], [b, y] = WK[k]; return x + (y - x) * (T - a) / (b - a); } return SD; }
+function unwarp(t){ for (let k = 1; k < WK.length; k++) if (t <= WK[k][1]){ const [a, x] = WK[k - 1], [b, y] = WK[k]; return a + (b - a) * (t - x) / (y - x || 1); } return DUR; }
+let RT = 0;
 
 /* ---------- palette ---------- */
 const INK_BG = '#060A18', PAPER = '#F2F4F7', CARBON = '#0F1115', GRAPH = '#454C57', SLATE = '#6B7280';
@@ -491,7 +509,9 @@ function s5(t){
 
 /* 12.0–13.5 · trajectory on brand blue, whip pan */
 const TL = ['2008', '2014', '2016', '2021', '2023', '2025', '2026'].map((y, k) => [y, ...T.tl[k]]);
-const camAt = t => 2000 * eIO(inv(12.0, 13.4, t));
+const camAt = LONG
+  ? t => { const u = inv(12.0, 13.4, t) * 4, k = Math.min(3, Math.floor(u)); return 500 * (k + eIO(inv(.3, .75, u - k))); }
+  : t => 2000 * eIO(inv(12.0, 13.4, t));
 function s6(t){
   const cam = camAt(t), v = Math.abs(camAt(t + .016) - cam) / .016;
   ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.lineWidth = 1;
@@ -539,7 +559,7 @@ function s7(t){
     font(600, 24, F.mono); ctx.fillStyle = HUDC; ctx.globalAlpha = inv(14.45, 14.7, t);
     tracked(T.s7Eye, 960, 318, 10, 'center'); ctx.globalAlpha = 1;
     font(600, 46, F.mono); ctx.fillStyle = Y;
-    typeOn('kangseongjun.com', 960, 736, 4, inv(14.4, 14.72, t), 'center', Math.floor(t * 4) % 2 === 0 || t < 14.72);
+    typeOn('kangseongjun.com', 960, 736, 4, inv(14.4, 14.72, t), 'center', Math.floor(RT * 4) % 2 === 0 || t < 14.72);
     font(400, 28, F.kr); ctx.fillStyle = SOFT; ctx.globalAlpha = inv(14.55, 14.8, t);
     tracked(T.s7Sub, 960, 806, 1, 'center');
     ctx.globalAlpha = 1;
@@ -556,7 +576,7 @@ function hud(t, sc){
     [[m, m, 1, 1], [W - m, m, -1, 1], [m, H - m, 1, -1], [W - m, H - m, -1, -1]].forEach(([x, y, a, b]) => {
       ctx.beginPath(); ctx.moveTo(x, y + L * b); ctx.lineTo(x, y); ctx.lineTo(x + L * a, y); ctx.stroke(); });
   }
-  const fr = Math.floor(t * 30), ss = String(Math.floor(fr / 30)).padStart(2, '0'), ff = String(fr % 30).padStart(2, '0');
+  const fr = Math.floor(RT * 30), ss = String(Math.floor(fr / 30)).padStart(2, '0'), ff = String(fr % 30).padStart(2, '0');
   font(600, 17, F.mono); ctx.textAlign = 'right';
   ctx.fillText(`SJK/REEL26  TC 00:00:${ss}:${ff}`, W - 96, H - 80);
   ctx.restore();
@@ -577,8 +597,9 @@ function transitions(t){
   flash(14.35, 14.6, '#fff', .7);
 }
 
-function render(t){
-  t = clamp(t, 0, DUR);
+function render(T){
+  T = clamp(T, 0, DUR); RT = T;
+  const t = warp(T);
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
   ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
   const sc = t < 2 ? 1 : t < 4.5 ? 2 : t < 7 ? 3 : t < 9.5 ? 4 : t < 12 ? 5 : t < 13.5 ? 6 : 7;
@@ -586,7 +607,7 @@ function render(t){
   else if (sc === 6){ ctx.fillStyle = BLUE; ctx.fillRect(0, 0, W, H); }
   else { ctx.fillStyle = INK_BG; ctx.fillRect(0, 0, W, H); ctx.drawImage(glowBg, 0, 0); }
   let sx = 0, sy = 0;
-  for (const [ti, a] of IMPACTS) if (t >= ti){ const e = Math.exp(-(t - ti) * 10) * a; sx += Math.sin(t * 97 + ti) * e; sy += Math.cos(t * 83 + ti) * e; }
+  for (const [ti, a] of IMPACTS) if (t >= ti){ const e = Math.exp(-(T - unwarp(ti)) * 10) * a; sx += Math.sin(T * 97 + ti) * e; sy += Math.cos(T * 83 + ti) * e; }
   ctx.save(); ctx.translate(sx, sy);
   [s1, s2, s3, s4, s5, s6, s7][sc - 1](t);
   ctx.restore();
@@ -594,7 +615,7 @@ function render(t){
   transitions(t);
   hud(t, sc);
   if (sc !== 3 && sc !== 6) ctx.drawImage(vign, 0, 0);
-  const fr = Math.floor(t * 24);
+  const fr = Math.floor(T * 24);
   ctx.save(); ctx.globalAlpha = sc === 3 ? .05 : .07; ctx.globalCompositeOperation = 'overlay';
   ctx.translate(-((fr * 97) % 256), -((fr * 57) % 256)); ctx.fillStyle = grainPats[fr % 3]; ctx.fillRect(0, 0, W + 256, H + 256);
   ctx.restore();
@@ -638,12 +659,37 @@ function sweep(T, len){ const o = actx.createOscillator(), g = actx.createGain()
 
 const EV = [];
 const ev = (t, fn) => EV.push([t, fn]);
+if (LONG){
+ev(0, T => { tone(T, 55, .25, 1.6); tone(T, 82.4, .12, 1.6); });
+ev(.5, T => riser(T, T + 1, .3));
+ev(1.5, T => impact(T, 1));
+[1.75, 1.85, 1.95, 2.05].forEach((x, k) => ev(x, T => tone(T, 1760 + k * 220, .06, .06)));
+ev(2.5, T => riser(T, T + 1, .2));
+var BN = [55, 55, 65.41, 49];
+for (let b = 3.5; b < 26.49; b += .5){
+  const n = Math.round((b - 3.5) / .5);
+  ev(b, T => kick(T, .95));
+  if (n & 1) ev(b, T => clap(T));
+  ev(b + .25, T => bass(T, BN[Math.floor(n / 2) % 4]));
+}
+for (let h = 3.5; h < 26.49; h += .25){ const k = Math.round((h - 3.5) / .25); ev(h, T => hat(T, k % 2 ? .05 : .1)); }
+[8, 13.5, 17.5, 22].forEach(c => ev(c - 1, T => riser(T, T + 1, .18)));
+ev(8, T => impact(T, .6));
+[8, 9, 10, 11].forEach((s, k) => { for (let j = 0; j < 5; j++) ev(s + .03 + j * .07, T => tone(T, 880 * Math.pow(1.12, j + k * 2), .05, .05, 'square')); });
+ev(12, T => clap(T, .45));
+ev(13.5, T => whoosh(T, 2.0, .28));
+ev(15.5, T => { clap(T, .5); tone(T, 1320, .1, .3, 'triangle'); });
+ev(18.7, T => sweep(T, 1.9));
+[22.3, 23.3, 24.3, 25.3].forEach(x => ev(x, T => whoosh(T, .5, .26)));
+ev(26.5, T => riser(T, T + 1, .32));
+ev(27.5, T => { impact(T, 1.2); pad(T, 2.5); });
+} else {
 ev(0, T => { tone(T, 55, .25, .9); tone(T, 82.4, .12, .9); });
 ev(.2, T => riser(T, T + .7, .3));
 ev(.9, T => impact(T, 1));
 [1.1, 1.2, 1.3, 1.4].forEach((x, k) => ev(x, T => tone(T, 1760 + k * 220, .06, .06)));
 ev(1.5, T => riser(T, T + .5, .2));
-const BN = [55, 55, 65.41, 49];
+var BN = [55, 55, 65.41, 49];
 for (let b = 2; b < 13.49; b += .5){
   const n = Math.round((b - 2) / .5);
   ev(b, T => kick(T, .95));
@@ -661,6 +707,7 @@ ev(10.2, T => sweep(T, 1.1));
 ev(12.0, T => whoosh(T, 1.4, .3));
 ev(13.5, T => riser(T, T + .85, .32));
 ev(14.35, T => { impact(T, 1.2); pad(T, 1.2); });
+}
 
 function scheduleFrom(t0){
   if (!actx) return;
