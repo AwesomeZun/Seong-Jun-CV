@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+output/render.log
+output/soundtrack.wav
+output/scene-*.jpg
