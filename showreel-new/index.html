@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>STAINED · 강성준 쇼릴</title>
+<style>
+:root{color-scheme:light;--paper:#EFEDEE;--pink:#FF4F8B;--vio:#3A2F9E;--deep:#221A5E;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+html,body{margin:0;background:var(--paper);color:var(--deep)}
+body{font-family:var(--sans)}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:20px;padding-block:40px 64px;display:grid;gap:36px}
+header{display:grid;gap:10px;border-bottom:4px solid var(--vio);padding-bottom:22px}
+.eyebrow{margin:0;font:600 12px/1.4 var(--mono);letter-spacing:.16em;color:var(--pink)}
+h1{margin:0;font:900 clamp(44px,8vw,96px)/.92 var(--sans);letter-spacing:-.03em;color:var(--vio);text-wrap:balance}
+h1 span{color:var(--pink);mix-blend-mode:multiply}
+.lede{margin:0;max-width:64ch;font-size:16px;line-height:1.65}
+section{display:grid;gap:16px}
+h2{margin:0;font:600 13px/1.4 var(--mono);letter-spacing:.14em;color:var(--vio)}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));align-items:start}
+.card{display:grid;gap:10px;background:#fff;border:2px solid var(--vio);padding:12px}
+.card video{width:100%;max-width:100%;display:block;background:var(--deep)}
+.card.land video{aspect-ratio:16/9}.card.port video{aspect-ratio:9/16}
+.meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font:600 12px/1.4 var(--mono);letter-spacing:.06em}
+.meta a{color:var(--vio);text-decoration:none;border-bottom:2px solid var(--pink)}
+.meta a:hover{color:var(--pink)}
+.meta a:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+footer{font:500 12px/1.7 var(--mono);color:var(--vio);max-width:80ch}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <p class="eyebrow">SJK/REEL · H&amp;E · 128 BPM · 8 CUTS</p>
+    <h1>STAINED<span>.</span></h1>
+    <p class="lede">kangseongjun.com의 이력서를 H&amp;E 염색 슬라이드를 두 가지 잉크로 찍은 리소그래프 포스터처럼 옮긴 쇼릴입니다. 15초와 30초, 한국어와 영어, 가로형과 세로형으로 모두 여덟 편입니다. 각 편마다 바로 재생되는 HTML과 MP4 파일이 있습니다.</p>
+  </header>
+  <section aria-labelledby="h-land"><h2 id="h-land">LANDSCAPE · 1920×1080</h2><div class="grid" id="land"></div></section>
+  <section aria-labelledby="h-port"><h2 id="h-port">PORTRAIT · 1080×1920</h2><div class="grid" id="port"></div></section>
+  <footer>HTML 페이지에는 화면 컨트롤이 없습니다. 열면 소리 없이 재생되고, 화면을 클릭하면 처음부터 소리와 함께 다시 재생됩니다. 스페이스바는 일시정지, 좌우 화살표는 0.5초 이동, F는 전체화면, M은 음소거입니다. 폰트가 내장돼 있어 오프라인에서도 열립니다.</footer>
+</main>
+<script>
+const L = { ko: '한국어', en: 'English' };
+for (const orient of ['landscape', 'portrait']){
+  const box = document.getElementById(orient === 'landscape' ? 'land' : 'port');
+  for (const dur of [15, 30]) for (const lang of ['ko', 'en']){
+    const id = `${lang}-${orient}-${dur}`, card = document.createElement('article');
+    card.className = 'card ' + (orient === 'landscape' ? 'land' : 'port');
+    card.innerHTML = `<video src="mp4/${id}.mp4" poster="mp4/${id}.jpg" controls muted playsinline preload="metadata" aria-label="${L[lang]} ${dur}s ${orient}"></video>
+      <div class="meta"><span>${L[lang]} · ${dur}s</span><span><a href="${id}.html">HTML</a> · <a href="mp4/${id}.mp4">MP4</a>${lang === 'en' && dur === 15 ? ` · <a href="gif/${id}.gif">GIF</a>` : ''}</span></div>`;
+    box.appendChild(card);
+  }
+}
+</script>
+</body>
+</html>

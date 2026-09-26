@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{title}}</title>
+<style>
+{{fonts}}
+:root{color-scheme:light}
+html,body{height:100%;margin:0;background:#EFEDEE;overflow:hidden}
+.stage{position:fixed;inset:0;display:grid;place-items:center;background:#EFEDEE;cursor:pointer}
+.stage canvas{display:block;width:min(100vw,calc(100vh * {{ratio}}));height:auto;max-width:100%}
+.stage.idle{cursor:none}
+</style>
+</head>
+<body>
+<!-- Built by build.py from src/. Edit src/reel.js, not this file. -->
+<div class="stage" id="stage"><canvas id="cv" aria-label="{{aria}}"></canvas></div>
+<script>window.REEL_CFG = {{cfg}};</script>
+<script>
+{{js}}
+</script>
+</body>
+</html>
